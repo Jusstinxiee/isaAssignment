@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+    </head>
+    <body>
+        <p>READER</p>
+        <div id="buttons">
+            <button id="single" onclick="getOne()">See most recent</button>
+            <button id="all" onclick="getAll()">See all quotes</button>
+        </div>
+        
+        <div id="quotes">
+            <p>Quotes</p>
+        </div>
+    
+    <script>
+        const xhttp = new XMLHttpRequest();
+        
+        function getAll() {
+            resource = "quotes/";
+            xhttp.open("GET", 'https://justinxie.ca/individual/API/v1/quotes');
+            xhttp.send();
+            xhttp.onreadystatechange = function () {
+                if (xhttp.readyState == 4 && xhttp.status == 200) {
+                    document.getElementById("quotes").innerHTML = 
+                        this.responseText;
+                        console.log("here");
+                }
+            }
+        }
+        
+        function getOne() {
+            xhttp.open("GET", 'https://justinxie.ca/individual/API/v1/quotes/1');
+            xhttp.send();
+            xhttp.onreadystatechange = function () {
+                if (xhttp.readyState == 4 && xhttp.status == 200) {
+                    document.getElementById("quotes").innerHTML = 
+                        this.responseText;
+                }
+            }
+        }
+        
+        
+    </script>
+    </body>
+</html>

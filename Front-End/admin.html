@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+    </head>
+    <body>
+        <p>ADMIN</p>
+        
+        <div id ="modify"></div>
+        
+        <div id="new">
+            <form>
+                <h1>Enter Quote and Author</h1>
+                <div>
+                    <label for="quote">Quote:</label>
+                    <input type="text" name="quote" id="quote-field">
+                </div>
+                <div>
+                    <label for="author">author:</label>
+                    <input type="text" name="author" id="author-field">
+                </div>
+                <input type="button" value="Store in DB" onclick="post()">
+            </form>
+        </div>
+        <p id="last-request"></p>
+        
+        <script>
+        const xhttp = new XMLHttpRequest();
+        
+        function getAll() {
+            resource = "quotes/";
+            xhttp.open("GET", 'https://justinxie.ca/individual/API/v1/quotes/start');
+            xhttp.send();
+            xhttp.onreadystatechange = function () {
+                if (xhttp.readyState == 4 && xhttp.status == 200) {
+                    document.getElementById("modify").innerHTML = 
+                        this.responseText;
+                }
+            }
+        }
+
+            function post() {
+                var quote = document.getElementById("quote-field").value;
+                var author = document.getElementById("author-field").value;
+                let data = {
+                    "quote": quote,
+                    "author": author
+                };
+                
+                xhttp.open("POST", 'https://justinxie.ca/individual/API/v1/quotes');
+                xhttp.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+                xhttp.send(JSON.stringify(data));
+                
+                xhttp.onreadystatechange=(e)=>{
+                    if (xhttp.readyState == 4 && xhttp.status == 200)
+                    {
+                        if (xhttp.responseText)
+                        {
+                            if (xhttp.responseText.charAt(0) == "U") {
+                                post();
+                            } else {
+                                document.getElementById('last-request').innerHTML = xhttp.responseText;
+                                console.log(xhttp.responseText);
+                                
+                            }
+
+                        }
+                    }
+                }
+            }
+            
+        function update(value) {
+            var id = value;
+            var quote = document.getElementById("quote" + id).value;
+            var author = document.getElementById("author" + id).value;
+            const params = "?quote=" + quote + "&author=" + author;
+            let data = {
+                    "quoteId": id,
+                    "quote": quote,
+                    "author": author
+                };
+            
+            xhttp.open("PUT", 'https://justinxie.ca/individual/API/v1/quotes' + id )
+            xhttp.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+            xhttp.send(JSON.stringify(data));
+            xhttp.onreadystatechange=(e)=>{
+                    if (xhttp.readyState == 4 && xhttp.status == 200)
+                    {
+                        if (xhttp.responseText.charAt(0) == "U") {
+                            update(value);
+                        } else {
+                            document.getElementById('last-request').innerHTML = xhttp.responseText;
+                            console.log(xhttp.responseText);
+                                
+                        }
+                    }
+            }
+        }
+        
+        function deleteQuote(value) {
+            let data = {
+                "quoteId": value
+            }
+            xhttp.open("DELETE", 'https://justinxie.ca/individual/API/v1/quotes' + value )
+            xhttp.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+            xhttp.send(JSON.stringify(data));
+            xhttp.onreadystatechange=(e)=>{
+                    if (xhttp.readyState == 4 && xhttp.status == 200)
+                    {
+                        if (xhttp.responseText.charAt(0) == "U") {
+                            deleteQuote(value);
+                            getAll();
+                        } else {
+                            document.getElementById('last-request').innerHTML = xhttp.responseText;
+                            console.log(xhttp.responseText);
+                            
+                                
+                        }
+                    }
+                }
+        }
+            
+            window.onload = getAll();
+        </script>
+
+    </body>
+</html>
